@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  MySamFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: function.handler
+      Runtime: nodejs6.10
+      CodeUri: 's3://servless-sam/function.zip'
+      Description: Creates thumbnails of uploaded images
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaExecute # Managed Policy
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:Scan
+              Resource: '*'
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: 
+                Ref: MySamApi
+
+  MySamApi:
+    Type: AWS::Serverless::Api
+    Properties:
+        StageName: prod
+        DefinitionBody:
+            swagger: 2.0
+            info:
+              title:
+                Ref: AWS::StackName
+            paths:
+              /:
+                get:
+                  produces:
+                    - "application/json"
+                  responses:
+                   '200':
+                     description: "200 response"
+                     schema:
+                       $ref: "#/definitions/Empty"
+                     headers:
+                       Access-Control-Allow-Origin:
+                         type: "string"                  
+                  x-amazon-apigateway-integration:
+                    httpMethod: POST
+                    type: aws
+                    uri:
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MySamFunction.Arn}/invocations
+                    responses:
+                      default:
+                        statusCode: "200"
+                        responseParameters:
+                          method.response.header.Access-Control-Allow-Origin: "'*'"
