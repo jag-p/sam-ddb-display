@@ -6,8 +6,8 @@ Resources:
     Properties:
       Handler: function.handler
       Runtime: nodejs6.10
-      CodeUri: 's3://servless-sam/function.zip'
-      Description: Creates thumbnails of uploaded images
+      CodeUri: 's3://<<bucket-name>>/function.zip'
+      Description: Scan DynamoDB table
       MemorySize: 128
       Timeout: 10
       Policies:
