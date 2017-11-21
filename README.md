@@ -6,7 +6,7 @@ Before deploying the Stack::
            
 	   Zip up function.js
 	   Create an S3 bucket and upload the function.zip file
-           Update template.yaml - bucket-name ( in CodeUri)
+	   Update template.yaml - bucket-name ( in CodeUri)
 
 After deploying the Stack:: 
 
