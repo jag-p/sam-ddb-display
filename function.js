@@ -5,13 +5,13 @@ var tablename = process.env.TABLE_NAME ;
 
 
 
-exports.handler = (event, context, callback) => {
+exports.scandb = (event, context, callback) => {
     dynamodb.scan({TableName: tablename}, (err, data) => {
         callback(null, data['Items']);
     });
 };
 
-exports.insert = (event, context, callback) => {
+exports.insertitem = (event, context, callback) => {
     var params = {
     TableName: tablename,
     Item:{

@@ -11,10 +11,10 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  MySamFunction:
+  MySamScanFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: function.handler
+      Handler: function.scandb
       Runtime: nodejs6.10
       CodeUri: 's3://<<bucket_name>>/function.zip'
       Description: Scan DynamoDB table
@@ -22,7 +22,7 @@ Resources:
       Timeout: 10
       Policies:
         - CloudWatchPutMetricPolicy: {}
-        - DynamoDBCrudPolicy:
+        - DynamoDBReadPolicy:
              TableName: 
                Ref: MySamTable
       Events:
@@ -37,6 +37,27 @@ Resources:
         Variables: 
           TABLE_NAME: 
             Ref: MySamTable
+
+  MySamInsertFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: function.insertitem
+      Runtime: nodejs6.10
+      CodeUri: 's3://<<bucket_name>>/function.zip'
+      Description: Scan DynamoDB table
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - CloudWatchPutMetricPolicy: {}
+        - DynamoDBCrudPolicy:
+             TableName: 
+               Ref: MySamTable
+      Environment: 
+        Variables: 
+          TABLE_NAME: 
+            Ref: MySamTable
+
+
 
   MySamApi:
     Type: AWS::Serverless::Api
@@ -64,7 +85,7 @@ Resources:
                     httpMethod: POST
                     type: aws
                     uri:
-                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MySamFunction.Arn}/invocations
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MySamScanFunction.Arn}/invocations
                     responses:
                       default:
                         statusCode: "200"
