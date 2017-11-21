@@ -2,10 +2,13 @@
 
 This is a dynamic s3 website which uses API gateway and Lambda to scan a Dynamodb Table and displays in tabular format. 
 
-Please update these before deploying:
+Before deploying the Stack::
            
-           function.js - dynamodb-table-name
-           
-           template.yaml - bucket-name ( in CodeUri)
+	   Zip up function.js
+	   Create an S3 bucket and upload the function.zip file
+           Update template.yaml - bucket-name ( in CodeUri)
 
-After deploying the API gateway, please update the api-gateway-url in index.html and upload to s3 bucket and enable website.
+After deploying the Stack:: 
+
+	   Update the <<api-gateway-url>> in index.html
+	   Upload to s3 bucket and enable website.

@@ -15,7 +15,7 @@
         <div class='table-responsive'>
             <table class='table table-striped' style='display: none'>
                 <tr>
-                    <th>Column1</th>
+                    <th>PriKey</th>
                     <th>Column2</th>
                     <th>Column3</th>
                     <th>Column4</th>
@@ -32,7 +32,7 @@
         $.get(api_gateway_url, function(data) {
             data.forEach(function(item) {
                 rows.push(`<tr> \
-                    <td>${item['Column1']['S']}</td> \
+                    <td>${item['PriKey']['S']}</td> \
                     <td>${item['Column2']['S']}</td> \
                     <td>${item['Column3']['S']}</td> \
                     <td>${item['Column4']['S']}</td> \

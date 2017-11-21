@@ -1,24 +1,30 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Resources:
+  MySamTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      PrimaryKey:
+        Name: PriKey
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
   MySamFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: function.handler
       Runtime: nodejs6.10
-      CodeUri: 's3://<<bucket-name>>/function.zip'
+      CodeUri: 's3://<<bucket_name>>/function.zip'
       Description: Scan DynamoDB table
       MemorySize: 128
       Timeout: 10
       Policies:
-        - AWSLambdaExecute # Managed Policy
-        - Version: '2012-10-17' # Policy Document
-          Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:GetItem
-                - dynamodb:Scan
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - DynamoDBCrudPolicy:
+             TableName: 
+               Ref: MySamTable
       Events:
         GetApi:
           Type: Api
@@ -27,6 +33,10 @@ Resources:
             Method: GET
             RestApiId: 
                 Ref: MySamApi
+      Environment: 
+        Variables: 
+          TABLE_NAME: 
+            Ref: MySamTable
 
   MySamApi:
     Type: AWS::Serverless::Api
@@ -60,3 +70,46 @@ Resources:
                         statusCode: "200"
                         responseParameters:
                           method.response.header.Access-Control-Allow-Origin: "'*'"
+                options:
+                  consumes:
+                  - "application/json"
+                  produces:
+                  - "application/json"
+                  responses:
+                    '200':
+                      description: "200 response"
+                      schema:
+                        $ref: "#/definitions/Empty"
+                      headers:
+                        Access-Control-Allow-Origin:
+                          type: "string"
+                        Access-Control-Allow-Methods:
+                          type: "string"
+                        Access-Control-Allow-Headers:
+                          type: "string"
+                  x-amazon-apigateway-integration:
+                    responses:
+                      default:
+                        statusCode: "200"
+                        responseParameters:
+                          method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                          method.response.header.Access-Control-Allow-Origin: "'*'"
+                    passthroughBehavior: "when_no_match"
+                    requestTemplates:
+                      application/json: "{\"statusCode\": 200}"
+                    type: "mock"
+            definitions:
+              Empty:
+                type: "object"
+                title: "Empty Schema"
+Outputs:
+  ApiUrl:
+    Description: URL of your API endpoint
+    Value: !Join
+      - ''
+      - - https://
+        - !Ref MySamApi
+        - '.execute-api.'
+        - !Ref 'AWS::Region'
+        - '.amazonaws.com/prod'
