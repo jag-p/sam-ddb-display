@@ -15,7 +15,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: function.scandb
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: 's3://<<bucket_name>>/function.zip'
       Description: Scan DynamoDB table
       MemorySize: 128
@@ -42,7 +42,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: function.insertitem
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: 's3://<<bucket_name>>/function.zip'
       Description: Scan DynamoDB table
       MemorySize: 128
